@@ -14,7 +14,9 @@ prev_heading_num = 0
 
 # ----------------- helpers -----------------
 def _wrap_0_360(deg: float) -> float:
-    return deg % 360
+    if deg >= 360 or deg <= -360:
+        deg = deg % 360
+    return deg
 
 def _wrapped_err(cur: float, desired: float) -> float:
     """Return signed smallest error in degrees, in [-180, 180)."""
@@ -58,6 +60,8 @@ def _p_turn_heading_sync(desired, left_motor, right_motor, prime_hub):
 
         left_motor.dc(_clamp_dc( sgn * duty))
         right_motor.dc(_clamp_dc(-sgn * duty))
+
+        wait(dt_ms)
 
         # await wait(dt_ms)  # yield to scheduler
 

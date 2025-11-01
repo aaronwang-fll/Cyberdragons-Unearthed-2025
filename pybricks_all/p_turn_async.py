@@ -2,7 +2,7 @@ from pybricks.tools import wait
 
 # --- Tuning knobs (adjust as needed) ---
 p_turn_k = 0.4      # proportional gain
-p_turn_c = 22       # base push to overcome friction (added magnitude)
+p_turn_c = 20       # base push to overcome friction (added magnitude)
 tolerance = 1.0     # degrees: how close counts as "done"
 dt_ms = 5          # loop sleep/yield in milliseconds
 
@@ -30,7 +30,7 @@ def _clamp_dc(x: float) -> float:
 
 
 # --------------- main turning logic ---------------
-def p_turn__heading_(desired, left_motor, right_motor, prime_hub):
+async def p_turn__heading_(desired, left_motor, right_motor, prime_hub):
     """Turn in place to an absolute heading (degrees 0..359). Awaitable."""
     global prev_heading_num
 
@@ -59,7 +59,7 @@ def p_turn__heading_(desired, left_motor, right_motor, prime_hub):
         left_motor.dc(_clamp_dc( sgn * duty))
         right_motor.dc(_clamp_dc(-sgn * duty))
 
-        # await wait(dt_ms)  # yield to scheduler
+        await wait(dt_ms)  # yield to scheduler
 
     # Stop motors cleanly
     left_motor.dc(0)
@@ -69,17 +69,17 @@ def p_turn__heading_(desired, left_motor, right_motor, prime_hub):
     prev_heading_num += 1
 
 
-def p_turn__incremental_(turn_amount, left_motor, right_motor, prime_hub):
+async def p_turn__incremental_(turn_amount, left_motor, right_motor, prime_hub):
     """Turn by a relative amount (degrees), awaitable."""
     global target_heading
     # Add and wrap so targets are always 0..359
     target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
-    p_turn__heading_(target_heading, left_motor, right_motor, prime_hub)
+    await p_turn__heading_(target_heading, left_motor, right_motor, prime_hub)
     print("finished pturn")
 
 
 # (optional) pivot variants if you ever want one-wheel turns
-def p_turn__pivot_(desired, pivot_left: bool, motor_left, motor_right, prime_hub):
+async def p_turn__pivot_(desired, pivot_left: bool, motor_left, motor_right, prime_hub):
     """Pivot around one wheel to a desired heading. Not used by your script."""
     desired = _wrap_0_360(desired)
     while True:
@@ -96,12 +96,12 @@ def p_turn__pivot_(desired, pivot_left: bool, motor_left, motor_right, prime_hub
         else:
             motor_right.dc(0)
             motor_left.dc(_clamp_dc( sgn * duty))
-        # await wait(dt_ms)
+        await wait(dt_ms)
     motor_left.dc(0)
     motor_right.dc(0)
 
 
-def p_turn__pivot_incremental_(turn_amount, pivot_left, motor_left, motor_right, prime_hub):
+async def p_turn__pivot_incremental_(turn_amount, pivot_left, motor_left, motor_right, prime_hub):
     global target_heading
     target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
-    p_turn__pivot_(target_heading, pivot_left, motor_left, motor_right, prime_hub)
+    await p_turn__pivot_(target_heading, pivot_left, motor_left, motor_right, prime_hub)
