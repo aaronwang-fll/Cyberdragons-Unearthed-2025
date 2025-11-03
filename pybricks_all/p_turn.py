@@ -2,7 +2,7 @@ from pybricks.tools import wait
 
 # --- Tuning knobs (adjust as needed) ---
 p_turn_k = 0.4      # proportional gain
-p_turn_c = 22       # base push to overcome friction (added magnitude)
+p_turn_c = 18.75       # base push to overcome friction (added magnitude)
 tolerance = 1.0     # degrees: how close counts as "done"
 dt_ms = 5          # loop sleep/yield in milliseconds
 
