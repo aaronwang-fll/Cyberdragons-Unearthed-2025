@@ -2,7 +2,7 @@ from pybricks.tools import wait
 
 # --- Tuning knobs (adjust as needed) ---
 p_turn_k = 0.4      # proportional gain
-p_turn_c = 18.75       # base push to overcome friction (added magnitude)
+p_turn_c = 22       # base push to overcome friction (added magnitude)
 tolerance = 1.0     # degrees: how close counts as "done"
 dt_ms = 5          # loop sleep/yield in milliseconds
 
@@ -14,9 +14,7 @@ prev_heading_num = 0
 
 # ----------------- helpers -----------------
 def _wrap_0_360(deg: float) -> float:
-    if deg >= 360 or deg <= -360:
-        deg = deg % 360
-    return deg
+    return deg % 360
 
 def _wrapped_err(cur: float, desired: float) -> float:
     """Return signed smallest error in degrees, in [-180, 180)."""
@@ -60,8 +58,6 @@ def _p_turn_heading_sync(desired, left_motor, right_motor, prime_hub):
 
         left_motor.dc(_clamp_dc( sgn * duty))
         right_motor.dc(_clamp_dc(-sgn * duty))
-
-        wait(dt_ms)
 
         # await wait(dt_ms)  # yield to scheduler
 
