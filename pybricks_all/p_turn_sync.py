@@ -2,7 +2,7 @@ from pybricks.tools import wait
 
 # --- Tuning knobs (adjust as needed) ---
 p_turn_k = 0.4      # proportional gain
-p_turn_c = 26       # base push to overcome friction (added magnitude)
+p_turn_c = 18.75       # base push to overcome friction (added magnitude)
 tolerance = 1.0     # degrees: how close counts as "done"
 dt_ms = 5          # loop sleep/yield in milliseconds
 
@@ -30,14 +30,13 @@ def _clamp_dc(x: float) -> float:
 
 
 # --------------- main turning logic ---------------
-def p_turn__heading_(desired, left_motor, right_motor, prime_hub, c_parameter):
+def p_turn__heading_(desired, left_motor, right_motor, prime_hub):
     """Turn in place to an absolute heading (degrees 0..359). Awaitable."""
     global prev_heading_num
 
     desired = _wrap_0_360(desired)
 
     # Optional: require a couple of consecutive "in tolerance" readings
-    p_turn_c = c_parameter
     stable_counts_needed = 2
     stable_counts = 0
 
@@ -70,12 +69,12 @@ def p_turn__heading_(desired, left_motor, right_motor, prime_hub, c_parameter):
     prev_heading_num += 1
 
 
-def p_turn__incremental_(turn_amount, left_motor, right_motor, prime_hub, c_parameter):
+def p_turn__incremental_(turn_amount, left_motor, right_motor, prime_hub):
     """Turn by a relative amount (degrees), awaitable."""
     global target_heading
     # Add and wrap so targets are always 0..359
     target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
-    p_turn__heading_(target_heading, left_motor, right_motor, prime_hub, c_parameter)
+    p_turn__heading_(target_heading, left_motor, right_motor, prime_hub)
     print("finished pturn")
 
 
