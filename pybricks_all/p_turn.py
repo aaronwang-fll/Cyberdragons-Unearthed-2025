@@ -180,3 +180,7 @@ async def p_turn_pivot_incremental_async(turn_amount, pivot_left, motor_left, mo
     global target_heading
     target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
     await _p_turn_pivot_async(target_heading, pivot_left, motor_left, motor_right, prime_hub)
+
+async def reset_current_heading():
+    global current_heading
+    current_heading = 0
