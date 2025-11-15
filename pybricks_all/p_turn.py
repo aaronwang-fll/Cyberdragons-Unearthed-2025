@@ -2,19 +2,20 @@ from pybricks.tools import wait
 
 # --- Tuning knobs (adjust as needed) ---
 p_turn_k = 0.4      # proportional gain
-p_turn_c = 22       # base push to overcome friction (added magnitude)
+p_turn_c = 18.75       # base push to overcome friction (added magnitude)
 tolerance = 1.0     # degrees: how close counts as "done"
 dt_ms = 5          # loop sleep/yield in milliseconds
 
 # --- State for incremental turns ---
 target_heading = 0
-previous_heading = [0]   # start assuming we began at 0°
-prev_heading_num = 0
+current_heading = 0
 
 
 # ----------------- helpers -----------------
 def _wrap_0_360(deg: float) -> float:
-    return deg % 360
+    if deg >= 360 or deg <= -360:
+        deg = deg % 360
+    return deg
 
 def _wrapped_err(cur: float, desired: float) -> float:
     """Return signed smallest error in degrees, in [-180, 180)."""
@@ -60,14 +61,13 @@ def _p_turn_heading_sync(desired, left_motor, right_motor, prime_hub, c_paramete
         left_motor.dc(_clamp_dc( sgn * duty))
         right_motor.dc(_clamp_dc(-sgn * duty))
 
+        wait(dt_ms)
+
         # await wait(dt_ms)  # yield to scheduler
 
     # Stop motors cleanly
     left_motor.dc(0)
     right_motor.dc(0)
-
-    previous_heading.append(desired)
-    prev_heading_num += 1
 
 async def _p_turn_heading_async(desired, left_motor, right_motor, prime_hub, c_parameter):
     """Turn in place to an absolute heading (degrees 0..359). Awaitable."""
@@ -105,26 +105,25 @@ async def _p_turn_heading_async(desired, left_motor, right_motor, prime_hub, c_p
     left_motor.dc(0)
     right_motor.dc(0)
 
-    previous_heading.append(desired)
-    prev_heading_num += 1
-
 
 def p_turn_incremental_sync(turn_amount, left_motor, right_motor, prime_hub, c_parameter):
-    """Turn by a relative amount (degrees), not awaitable."""
-    global target_heading
+    """Turn by a relative amount (degrees), awaitable."""
+    global current_heading
     # Add and wrap so targets are always 0..359
-    target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
+    target_heading = _wrap_0_360(current_heading + turn_amount)
     #await p_turn__heading_(target_heading, left_motor, right_motor, prime_hub)
     _p_turn_heading_sync(target_heading, left_motor, right_motor, prime_hub, c_parameter)
     print("finished pturn")
+    current_heading = target_heading
 
 async def p_turn_incremental_async(turn_amount, left_motor, right_motor, prime_hub, c_parameter):
     """Turn by a relative amount (degrees), awaitable."""
-    global target_heading
+    global current_heading
     # Add and wrap so targets are always 0..359
-    target_heading = _wrap_0_360(previous_heading[prev_heading_num] + turn_amount)
+    target_heading = _wrap_0_360(current_heading + turn_amount)
     await _p_turn_heading_async(target_heading, left_motor, right_motor, prime_hub, c_parameter)
     print("finished pturn")
+    current_heading = target_heading
 
 
 # (optional) pivot variants if you ever want one-wheel turns
