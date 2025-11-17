@@ -111,9 +111,7 @@ def p_turn_incremental_sync(turn_amount, left_motor, right_motor, prime_hub, c_p
     global current_heading
     # Add and wrap so targets are always 0..359
     target_heading = _wrap_0_360(current_heading + turn_amount)
-    #await p_turn__heading_(target_heading, left_motor, right_motor, prime_hub)
     _p_turn_heading_sync(target_heading, left_motor, right_motor, prime_hub, c_parameter)
-    print("finished pturn")
     current_heading = target_heading
 
 async def p_turn_incremental_async(turn_amount, left_motor, right_motor, prime_hub, c_parameter):
@@ -122,7 +120,6 @@ async def p_turn_incremental_async(turn_amount, left_motor, right_motor, prime_h
     # Add and wrap so targets are always 0..359
     target_heading = _wrap_0_360(current_heading + turn_amount)
     await _p_turn_heading_async(target_heading, left_motor, right_motor, prime_hub, c_parameter)
-    print("finished pturn")
     current_heading = target_heading
 
 
