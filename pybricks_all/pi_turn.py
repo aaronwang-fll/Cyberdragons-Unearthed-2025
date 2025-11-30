@@ -70,6 +70,9 @@ def _pi_turn_heading_sync(desired, left_motor, right_motor, prime_hub, c_paramet
         err_sum += err * dt_s
 
         # clamp integral sum
+        if desired <= 25:
+            sum_cap = 40
+        
         if err_sum > sum_cap:
             err_sum = sum_cap
         elif err_sum < -sum_cap:
