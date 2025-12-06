@@ -5,7 +5,7 @@ from pybricks.tools import wait
 # PI gains
 kp_turn = 1.0       # proportional gain (from program 2)
 ki_turn = 0.4       # integral gain (from program 2)
-sum_cap = 30.0      # cap for integral sum (anti-windup)
+sum_cap = 40.0      # cap for integral sum (anti-windup)
 
 # base push (same idea as your p_turn_c, still passed in as c_parameter)
 p_turn_c = 0    # default; you can override with c_parameter
@@ -70,9 +70,7 @@ def _pi_turn_heading_sync(desired, left_motor, right_motor, prime_hub, c_paramet
         err_sum += err * dt_s
 
         # clamp integral sum
-        if desired <= 25:
-            sum_cap = 40
-        
+
         if err_sum > sum_cap:
             err_sum = sum_cap
         elif err_sum < -sum_cap:
@@ -81,9 +79,6 @@ def _pi_turn_heading_sync(desired, left_motor, right_motor, prime_hub, c_paramet
         i_term = ki_turn * err_sum
 
         pid = p_term + i_term   # D = 0 for now
-
-        # Optional: debug print
-        # print("P:", p_term, "I:", i_term, "Angle:", cur)
 
         # --- Convert PID output to motor.dc ---
         # direction from sign of pid
@@ -182,9 +177,11 @@ def p_turn_incremental_sync(turn_amount, left_motor, right_motor, prime_hub, c_p
 async def p_turn_incremental_async(turn_amount, left_motor, right_motor, prime_hub, c_parameter):
     """Turn by a relative amount (degrees), async."""
     global current_heading
+    # print("Before Turn Heading:", current_heading)
     target_heading = _wrap_0_360(current_heading + turn_amount)
     await _pi_turn_heading_async(target_heading, left_motor, right_motor, prime_hub, c_parameter)
     current_heading = target_heading
+    # print("After Turn Heading:", current_heading)
 
 
 # --------------- optional: pivot variants still P-only ---------------
